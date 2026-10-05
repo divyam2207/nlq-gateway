@@ -36,15 +36,15 @@ Every team building filter-heavy UIs — firewalls, identity dashboards, audit l
 
 **NLQ Gateway** is a centralized service where any team provides their filter schema and gets back a zero-hallucination NL search bar that converts human language into perfectly typed filter objects.
 
-### How It's Different from LLMs
+### How It's Different from LLMs & SLMs
 
-| | Traditional LLMs (GPT-4, Claude) | NLQ Gateway (Laya-MLX / Jev) |
-|---|---|---|
-| **Output method** | Autoregressive token generation | Non-autoregressive evaluation |
-| **Latency** | 2,000–10,000ms | 7–50ms |
-| **Hallucination** | Can invent fields/values | Mathematically impossible — evaluates against bounded schema |
-| **Output format** | Free text (needs parsing) | Strictly typed JSON (always valid) |
-| **Typos** | `{"severty": "critical"}` possible | Output constrained to schema-defined values |
+| | Traditional LLMs (GPT-4, Claude) | SLMs (Llama-3 8B, Phi-3) | NLQ Gateway (Laya-MLX / Jev) |
+|---|---|---|---|
+| **Output method** | Autoregressive token generation | Autoregressive token generation | Non-autoregressive evaluation |
+| **Latency** | 2,000–10,000ms | 1,000–3,000ms (client-side) | 7–50ms |
+| **Hallucination** | Can invent fields/values | Higher risk of inventing fields/values | Mathematically impossible — evaluates against bounded schema |
+| **Output format** | Free text (needs parsing) | Free text (needs heavy validation loops) | Strictly typed JSON (always valid) |
+| **Typos** | `{"severty": "critical"}` possible | High typo risk; `{"severty": "critical"}` | Output constrained to schema-defined values |
 
 ---
 
