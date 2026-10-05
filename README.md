@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 🔮 NLQ Gateway
 
@@ -498,4 +498,3 @@ See [docs/architecture.md](docs/architecture.md) for the full plan.
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) for details.
-]]>
