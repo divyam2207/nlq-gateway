@@ -1,0 +1,61 @@
+# NLQ Gateway Configuration
+# ========================
+# Change provider.type to swap inference backends without code changes.
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+
+# ─── Inference Provider ──────────────────────────────────────────────
+# Phase 1: Laya-MLX (local Apple Silicon inference)
+provider:
+  type: "laya-mlx"
+  model_id: "aac6fef/laya-mlx"
+
+# Phase 2: Uncomment below and comment above to swap to Jev API
+# provider:
+#   type: "jev"
+#   api_url: "https://jev.internal.corp/v1"
+#   api_key: "${JEV_API_KEY}"
+
+# ─── Translation Engine ─────────────────────────────────────────────
+translation:
+  # Minimum confidence to auto-apply a filter (green chip in UI)
+  confidence_threshold: 0.7
+  # Minimum relevance score to consider a field mentioned by the user
+  relevance_threshold: 0.6
+  # Maximum depth for cascading filter resolution
+  max_cascade_depth: 5
+
+# ─── Semantic Cache ──────────────────────────────────────────────────
+cache:
+  enabled: true
+  # Phase 1: in-memory cache (no external dependencies)
+  backend: "memory"
+  max_entries: 10000
+  # Minimum cosine similarity to consider a cache hit
+  similarity_threshold: 0.95
+
+  # Phase 2: Uncomment for Redis-backed cache
+  # backend: "redis"
+  # redis_url: "redis://localhost:6379/0"
+  # ttl_seconds: 3600
+
+# ─── Schema Registry ────────────────────────────────────────────────
+schema_registry:
+  # Phase 1: file-based (schemas loaded from disk)
+  backend: "file"
+  schemas_dir: "schemas/"
+
+  # Phase 2: Uncomment for database-backed registry
+  # backend: "firestore"
+  # project_id: "your-gcp-project"
+  # collection: "nlq-schemas"
+
+# ─── Logging ─────────────────────────────────────────────────────────
+logging:
+  level: "INFO"
+  format: "json"

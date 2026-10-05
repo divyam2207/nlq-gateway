@@ -1,0 +1,92 @@
+{
+  "schema_id": "iam-audit-v1",
+  "name": "Identity & Access Management Audit Filters",
+  "version": "1.0.0",
+  "description": "Filter schema for IAM audit events. Demonstrates cascading based on user role and authentication method.",
+  "fields": [
+    {
+      "id": "event_type",
+      "label": "Event Type",
+      "type": "choice",
+      "options": ["login", "logout", "privilege_escalation", "password_change", "account_lockout", "mfa_enrollment"],
+      "nl_hint": "The type of identity/access event"
+    },
+    {
+      "id": "user_role",
+      "label": "User Role",
+      "type": "choice",
+      "options": ["admin", "editor", "viewer", "service_account", "guest"],
+      "nl_hint": "The role of the user who performed the action"
+    },
+    {
+      "id": "auth_method",
+      "label": "Authentication Method",
+      "type": "choice",
+      "options": ["password", "mfa", "sso", "certificate", "api_key"],
+      "nl_hint": "How the user authenticated"
+    },
+    {
+      "id": "is_successful",
+      "label": "Success Status",
+      "type": "boolean",
+      "nl_hint": "Whether the authentication or action was successful or failed"
+    },
+    {
+      "id": "timestamp",
+      "label": "Time Range",
+      "type": "temporal",
+      "nl_hint": "When the event occurred"
+    }
+  ],
+  "cascades": [
+    {
+      "trigger_field": "user_role",
+      "trigger_values": ["admin"],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "admin_scope",
+          "label": "Admin Scope",
+          "type": "choice",
+          "options": ["global", "org_unit", "project", "resource"],
+          "nl_hint": "The scope or level of admin privileges"
+        }
+      ]
+    },
+    {
+      "trigger_field": "auth_method",
+      "trigger_values": ["mfa"],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "mfa_type",
+          "label": "MFA Type",
+          "type": "choice",
+          "options": ["totp", "sms", "hardware_key", "push_notification", "biometric"],
+          "nl_hint": "The type of multi-factor authentication used"
+        }
+      ]
+    },
+    {
+      "trigger_field": "is_successful",
+      "trigger_values": [false],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "failure_reason",
+          "label": "Failure Reason",
+          "type": "choice",
+          "options": ["invalid_credentials", "expired_token", "ip_blocked", "account_disabled", "mfa_failed"],
+          "nl_hint": "Why the authentication or action failed"
+        }
+      ]
+    }
+  ],
+  "example_queries": [
+    "Failed admin logins from last week",
+    "All privilege escalations this quarter",
+    "Successful MFA logins using hardware keys yesterday",
+    "Service account authentications via API key in the past 24 hours",
+    "Account lockouts for guest users this month"
+  ]
+}

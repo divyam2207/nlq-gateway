@@ -1,0 +1,92 @@
+{
+  "schema_id": "firewall-demo",
+  "name": "Firewall Log Filters",
+  "version": "1.0.0",
+  "description": "Filter schema for firewall event logs. Demonstrates choice, boolean, temporal types, and cascading dependencies.",
+  "fields": [
+    {
+      "id": "severity",
+      "label": "Severity Level",
+      "type": "choice",
+      "options": ["critical", "high", "medium", "low", "info"],
+      "nl_hint": "The severity or criticality level of the event"
+    },
+    {
+      "id": "action",
+      "label": "Firewall Action",
+      "type": "choice",
+      "options": ["drop", "allow", "deny", "reject"],
+      "nl_hint": "What the firewall did with the traffic (e.g., blocked, allowed)"
+    },
+    {
+      "id": "source_zone",
+      "label": "Source Zone",
+      "type": "choice",
+      "options": ["dmz", "internal", "external", "guest"],
+      "nl_hint": "The network zone the traffic originated from"
+    },
+    {
+      "id": "is_inbound",
+      "label": "Traffic Direction",
+      "type": "boolean",
+      "nl_hint": "Whether the traffic is inbound (incoming) or outbound (outgoing)"
+    },
+    {
+      "id": "timestamp",
+      "label": "Time Range",
+      "type": "temporal",
+      "nl_hint": "When the event occurred (e.g., yesterday, last 24 hours, this week)"
+    }
+  ],
+  "cascades": [
+    {
+      "trigger_field": "source_zone",
+      "trigger_values": ["internal"],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "internal_subnet",
+          "label": "Internal Subnet",
+          "type": "choice",
+          "options": ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "192.168.1.0/24"],
+          "nl_hint": "Which internal subnet the traffic came from"
+        }
+      ]
+    },
+    {
+      "trigger_field": "action",
+      "trigger_values": ["drop", "deny", "reject"],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "block_reason",
+          "label": "Block Reason",
+          "type": "choice",
+          "options": ["policy_violation", "rate_limit", "geo_block", "signature_match", "reputation"],
+          "nl_hint": "Why the traffic was blocked or denied"
+        }
+      ]
+    },
+    {
+      "trigger_field": "block_reason",
+      "trigger_values": ["signature_match"],
+      "trigger_mode": "any",
+      "dependent_fields": [
+        {
+          "id": "signature_category",
+          "label": "Signature Category",
+          "type": "choice",
+          "options": ["malware", "exploit", "command_and_control", "data_exfiltration", "phishing"],
+          "nl_hint": "The category of the threat signature that matched"
+        }
+      ]
+    }
+  ],
+  "example_queries": [
+    "Show me all critical firewall drops from yesterday",
+    "Denied traffic from external zone in the last 24 hours",
+    "Internal drops due to rate limiting on 10.0.1.0 subnet",
+    "High severity inbound events this week",
+    "All blocked traffic with signature-based malware detection"
+  ]
+}
